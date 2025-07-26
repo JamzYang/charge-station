@@ -79,6 +79,50 @@ public class ChargePoint {
     }
 
     /**
+     * 从数据库重建充电桩对象（不发布领域事件）
+     *
+     * @param chargePointId 充电桩ID
+     * @param stationId 所属充电站ID
+     * @param name 充电桩名称
+     * @param model 型号
+     * @param vendor 厂商
+     * @param serialNumber 序列号
+     * @param firmwareVersion 固件版本
+     * @param status 设备状态
+     * @param lastHeartbeat 最后心跳时间
+     * @param powerSpecification 功率规格
+     * @param connectors 充电枪列表
+     * @param createdAt 创建时间
+     * @param updatedAt 更新时间
+     * @param version 版本号
+     * @return 重建的充电桩对象
+     */
+    public static ChargePoint reconstruct(ChargePointId chargePointId, StationId stationId,
+                                        String name, String model, String vendor, String serialNumber,
+                                        String firmwareVersion, DeviceStatus status, Instant lastHeartbeat,
+                                        PowerSpecification powerSpecification, List<Connector> connectors,
+                                        Instant createdAt, Instant updatedAt, Long version) {
+        ChargePoint chargePoint = new ChargePoint();
+        chargePoint.chargePointId = Objects.requireNonNull(chargePointId, "充电桩ID不能为空");
+        chargePoint.stationId = Objects.requireNonNull(stationId, "充电站ID不能为空");
+        chargePoint.name = name;
+        chargePoint.model = model;
+        chargePoint.vendor = vendor;
+        chargePoint.serialNumber = serialNumber;
+        chargePoint.firmwareVersion = firmwareVersion;
+        chargePoint.status = Objects.requireNonNull(status, "设备状态不能为空");
+        chargePoint.lastHeartbeat = lastHeartbeat;
+        chargePoint.powerSpecification = powerSpecification;
+        chargePoint.connectors = connectors != null ? new ArrayList<>(connectors) : new ArrayList<>();
+        chargePoint.createdAt = Objects.requireNonNull(createdAt, "创建时间不能为空");
+        chargePoint.updatedAt = Objects.requireNonNull(updatedAt, "更新时间不能为空");
+        chargePoint.version = Objects.requireNonNull(version, "版本号不能为空");
+
+        // 注意：重建对象时不发布领域事件
+        return chargePoint;
+    }
+
+    /**
      * 验证充电桩名称
      */
     private String validateName(String name) {

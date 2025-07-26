@@ -36,6 +36,7 @@ public class ChargePointApplicationService {
     private final ChargePointRepository chargePointRepository;
     private final StationRepository stationRepository;
     private final ChargePointDomainService chargePointDomainService;
+    private final DomainEventPublishingService domainEventPublishingService;
 
     /**
      * 创建充电桩
@@ -74,10 +75,13 @@ public class ChargePointApplicationService {
         
         // 5. 保存充电桩
         ChargePoint savedChargePoint = chargePointRepository.save(chargePoint);
-        
-        log.info("充电桩创建成功: chargePointId={}, stationId={}, name={}", 
+
+        // 6. 发布领域事件
+        domainEventPublishingService.publishDomainEvents(savedChargePoint);
+
+        log.info("充电桩创建成功: chargePointId={}, stationId={}, name={}",
             savedChargePoint.getChargePointId(), savedChargePoint.getStationId(), savedChargePoint.getName());
-        
+
         return savedChargePoint;
     }
 
@@ -166,9 +170,12 @@ public class ChargePointApplicationService {
         
         chargePoint.updateStatus(newStatus, timestamp);
         ChargePoint updatedChargePoint = chargePointRepository.save(chargePoint);
-        
+
+        // 发布领域事件
+        domainEventPublishingService.publishDomainEvents(updatedChargePoint);
+
         log.info("充电桩状态更新成功: chargePointId={}, newStatus={}", chargePointId, newStatus);
-        
+
         return updatedChargePoint;
     }
 

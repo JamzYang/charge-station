@@ -122,8 +122,8 @@ tasks.withType<JavaCompile> {
 // Flyway configuration
 flyway {
     url = "jdbc:postgresql://localhost:5432/charge_station"
-    user = "postgres"
-    password = "postgres"
+    user = "test"
+    password = "test"
     schemas = arrayOf("public")
     locations = arrayOf("classpath:db/migration")
 }

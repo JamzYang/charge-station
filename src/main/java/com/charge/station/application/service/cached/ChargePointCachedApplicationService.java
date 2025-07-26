@@ -8,9 +8,9 @@ import com.charge.station.domain.model.shared.DeviceStatus;
 import com.charge.station.domain.model.station.StationId;
 import com.charge.station.infrastructure.cache.CacheConfig;
 import com.charge.station.infrastructure.cache.CacheService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,20 +19,25 @@ import java.util.Objects;
 
 /**
  * 带缓存的充电桩应用服务
- * 
+ *
  * 使用装饰器模式为充电桩应用服务添加缓存功能，实现Cache-Aside模式。
- * 
+ *
  * @author 架构师团队
  * @version 1.0
  */
 @Service
-@Primary
-@RequiredArgsConstructor
-@Slf4j
 public class ChargePointCachedApplicationService {
+
+    private static final Logger log = LoggerFactory.getLogger(ChargePointCachedApplicationService.class);
 
     private final ChargePointApplicationService chargePointApplicationService;
     private final CacheService cacheService;
+
+    public ChargePointCachedApplicationService(ChargePointApplicationService chargePointApplicationService,
+                                              CacheService cacheService) {
+        this.chargePointApplicationService = chargePointApplicationService;
+        this.cacheService = cacheService;
+    }
 
     /**
      * 创建充电桩

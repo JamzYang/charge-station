@@ -112,13 +112,35 @@ curl http://localhost:8080/actuator/health
 
 ### 测试
 
+#### 单元测试
+
 ```bash
-# 运行所有测试
+# 运行所有单元测试
 ./gradlew test
 
 # 运行特定测试
 ./gradlew test --tests "com.charge.station.*"
 ```
+
+#### 集成测试
+
+集成测试使用 Docker 容器环境，提供更稳定可靠的测试体验：
+
+```bash
+# 快速运行集成测试（推荐）
+.\test-tasks.ps1 test
+
+# 启动测试环境
+.\test-tasks.ps1 start
+
+# 运行集成测试
+./gradlew test --tests '*IntegrationTest'
+
+# 停止测试环境
+.\test-tasks.ps1 stop
+```
+
+更多测试相关信息，请参考 [集成测试指南](docs/integration-testing-guide.md)。
 
 ## API文档
 

@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author 架构师团队
  * @version 1.0
  */
-public interface ChargePointRepository {
+public interface ChargePointRepository  {
 
     /**
      * 保存充电桩

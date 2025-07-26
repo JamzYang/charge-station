@@ -17,7 +17,12 @@ public final class KafkaTopics {
      * 下行指令主题 - 向网关发送的控制指令
      */
     public static final String COMMANDS_DOWN = "commands-down";
-    
+
+    /**
+     * 集成事件主题 - 场站服务对外发布的集成事件
+     */
+    public static final String INTEGRATION_EVENTS = "station-integration-events";
+
     private KafkaTopics() {
         // 工具类，禁止实例化
     }

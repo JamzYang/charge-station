@@ -30,6 +30,7 @@ public class StationApplicationService {
 
     private final StationRepository stationRepository;
     private final StationDomainService stationDomainService;
+    private final DomainEventPublishingService domainEventPublishingService;
 
     /**
      * 创建充电站
@@ -59,9 +60,12 @@ public class StationApplicationService {
         
         // 5. 保存充电站
         Station savedStation = stationRepository.save(station);
-        
+
+        // 6. 发布领域事件
+        domainEventPublishingService.publishDomainEvents(savedStation);
+
         log.info("充电站创建成功: stationId={}, name={}", savedStation.getStationId(), savedStation.getStationInfo().name());
-        
+
         return savedStation;
     }
 
@@ -100,9 +104,12 @@ public class StationApplicationService {
         
         // 6. 保存更新
         Station updatedStation = stationRepository.save(station);
-        
+
+        // 7. 发布领域事件
+        domainEventPublishingService.publishDomainEvents(updatedStation);
+
         log.info("充电站更新成功: stationId={}, name={}", updatedStation.getStationId(), updatedStation.getStationInfo().name());
-        
+
         return updatedStation;
     }
 
@@ -165,9 +172,12 @@ public class StationApplicationService {
         
         station.activate();
         Station activatedStation = stationRepository.save(station);
-        
+
+        // 发布领域事件
+        domainEventPublishingService.publishDomainEvents(activatedStation);
+
         log.info("充电站激活成功: stationId={}", stationId);
-        
+
         return activatedStation;
     }
 
@@ -211,9 +221,12 @@ public class StationApplicationService {
         
         station.setMaintenance();
         Station maintenanceStation = stationRepository.save(station);
-        
+
+        // 发布领域事件
+        domainEventPublishingService.publishDomainEvents(maintenanceStation);
+
         log.info("充电站维护状态设置成功: stationId={}", stationId);
-        
+
         return maintenanceStation;
     }
 
