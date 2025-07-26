@@ -64,4 +64,8 @@ public record ChargePointId(String value) {
     public String toString() {
         return value;
     }
+
+    public String getValue() {
+        return value;
+    }
 }
