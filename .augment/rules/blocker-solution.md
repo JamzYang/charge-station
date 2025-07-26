@@ -17,3 +17,5 @@ Instead of automatically implementing temporary solutions, you should:
 - Wait for explicit user approval before making changes
 
 This ensures the user maintains control over important project decisions and understands any compromises being made.
+
+
