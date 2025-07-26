@@ -11,6 +11,16 @@ spring:
   application:
     name: charge-station-service
 
+  # Jackson配置
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      write-durations-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
   # 数据源配置
   datasource:
     url: jdbc:postgresql://localhost:5432/charge_station

@@ -46,7 +46,7 @@ public class StationController {
      * @param request 创建请求
      * @return 创建的充电站信息
      */
-    @PostMapping
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "创建充电站", description = "创建新的充电站")
     public ApiResponse<StationResponse> createStation(@Valid @RequestBody CreateStationRequest request) {

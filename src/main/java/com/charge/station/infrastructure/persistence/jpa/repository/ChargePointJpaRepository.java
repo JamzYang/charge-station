@@ -23,8 +23,17 @@ import java.util.Optional;
 public interface ChargePointJpaRepository extends JpaRepository<ChargePointEntity, String> {
     
     /**
+     * 根据ID查找充电桩（包含关联的充电枪）
+     *
+     * @param id 充电桩ID
+     * @return 充电桩实体
+     */
+    @Query("SELECT cp FROM ChargePointEntity cp LEFT JOIN FETCH cp.connectors WHERE cp.id = :id")
+    Optional<ChargePointEntity> findByIdWithConnectors(@Param("id") String id);
+
+    /**
      * 根据序列号查找充电桩
-     * 
+     *
      * @param serialNumber 序列号
      * @return 充电桩实体
      */

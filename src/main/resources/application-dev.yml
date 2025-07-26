@@ -2,7 +2,7 @@
 spring:
   # 数据源配置 - 使用测试环境的PostgreSQL
   datasource:
-    url: jdbc:postgresql://localhost:5432/station_test
+    url: jdbc:postgresql://localhost:5432/charge_station
     username: test
     password: test
     driver-class-name: org.postgresql.Driver

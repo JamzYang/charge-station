@@ -44,6 +44,9 @@ dependencies {
     // PostGIS for spatial data
     implementation("net.postgis:postgis-jdbc:2023.1.0")
     implementation("org.hibernate:hibernate-spatial:6.5.2.Final")
+
+    // Hibernate Types for JSONB support
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.3")
     
     // Redis client
     implementation("org.redisson:redisson-spring-boot-starter:3.27.2")

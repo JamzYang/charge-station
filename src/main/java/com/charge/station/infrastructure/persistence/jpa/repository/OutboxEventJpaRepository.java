@@ -16,9 +16,9 @@ import java.util.UUID;
 
 /**
  * 发件箱事件JPA仓储
- * 
+ *
  * 提供发件箱事件的数据访问操作。
- * 
+ *
  * @author 架构师团队
  * @version 1.0
  */

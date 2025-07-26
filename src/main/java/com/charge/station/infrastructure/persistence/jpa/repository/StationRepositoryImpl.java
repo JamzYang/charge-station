@@ -10,7 +10,6 @@ import com.charge.station.infrastructure.persistence.jpa.entity.StationEntity;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -23,28 +22,29 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 充电站仓储JPA实现
+ * 充电站仓储JPA适配器
  *
  * 实现充电站仓储接口，提供基于JPA的数据持久化操作。
+ * 
+ * 注意：类名避免使用 "JpaRepositoryImpl" 后缀，以免与 Spring Data JPA 的命名约定冲突
  *
  * @author 架构师团队
  * @version 1.0
  */
 @Repository("stationRepositoryImpl")
-public class StationJpaRepositoryImpl implements StationRepository {
+public class StationRepositoryImpl implements StationRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(StationJpaRepositoryImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(StationRepositoryImpl.class);
 
     private final StationJpaRepository jpaRepository;
     private final StationEntityConverter converter;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
-    public StationJpaRepositoryImpl(@Lazy StationJpaRepository jpaRepository,
-                                   StationEntityConverter converter) {
+    public StationRepositoryImpl(StationJpaRepository jpaRepository,
+                                      StationEntityConverter converter) {
         this.jpaRepository = jpaRepository;
         this.converter = converter;
     }
-
 
     
     @Override

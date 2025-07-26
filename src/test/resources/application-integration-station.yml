@@ -1,7 +1,8 @@
+# 充电站应用服务集成测试配置
 spring:
   # 数据源配置 - 连接到Docker容器中的PostgreSQL
   datasource:
-    url: jdbc:postgresql://localhost:5432/charge_station
+    url: jdbc:postgresql://localhost:5432/station_test
     username: test
     password: test
     driver-class-name: org.postgresql.Driver
@@ -22,15 +23,18 @@ spring:
         dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
         format_sql: true
         use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
     open-in-view: false
 
   # Redis配置 - 连接到Docker容器中的Redis
-  # 注意：如果网关服务已运行，会自动连接到网关的Redis服务
   data:
     redis:
       host: localhost
       port: 6379
-      database: 0
+      database: 1  # 使用不同的数据库避免冲突
       timeout: 2000ms
       lettuce:
         pool:
@@ -40,7 +44,6 @@ spring:
           max-wait: 2000ms
 
   # Kafka配置 - 连接到Docker容器中的Kafka
-  # 注意：如果网关服务已运行，会自动连接到网关的Kafka服务
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -61,7 +64,7 @@ spring:
     listener:
       ack-mode: manual_immediate
 
-  # Flyway配置 - 测试时禁用
+  # Flyway配置 - 禁用以避免与Hibernate冲突
   flyway:
     enabled: false
 
@@ -72,5 +75,30 @@ logging:
     org.springframework.kafka: WARN
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId}] %logger{36} - %msg%n"
+    org.springframework.transaction: DEBUG
+    org.springframework.orm.jpa: DEBUG
+
+# 应用配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# 测试专用配置
+test:
+  # 测试数据配置
+  data:
+    cleanup:
+      enabled: true
+      timeout: 30s
+  
+  # 测试环境检查配置
+  environment:
+    check:
+      enabled: true
+      timeout: 10s
+      retry-count: 3

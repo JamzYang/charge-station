@@ -7,9 +7,7 @@ import com.charge.station.domain.model.station.StationId;
 import com.charge.station.domain.repository.ChargePointRepository;
 import com.charge.station.infrastructure.persistence.jpa.converter.ChargePointEntityConverter;
 import com.charge.station.infrastructure.persistence.jpa.entity.ChargePointEntity;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -21,22 +19,24 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * 充电桩仓储JPA实现
+ * 充电桩仓储JPA适配器
  *
  * 实现充电桩仓储接口，提供基于JPA的数据持久化操作。
+ * 
+ * 注意：类名避免使用 "JpaRepositoryImpl" 后缀，以免与 Spring Data JPA 的命名约定冲突
  *
  * @author 架构师团队
  * @version 1.0
  */
 @Repository("chargePointRepositoryImpl")
 @Slf4j
-public class ChargePointJpaRepositoryImpl implements ChargePointRepository {
+public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     private final ChargePointJpaRepository jpaRepository;
     private final ChargePointEntityConverter converter;
 
-    public ChargePointJpaRepositoryImpl(@Lazy ChargePointJpaRepository jpaRepository,
-                                       ChargePointEntityConverter converter) {
+    public ChargePointRepositoryImpl(@Lazy ChargePointJpaRepository jpaRepository,
+                                          ChargePointEntityConverter converter) {
         this.jpaRepository = jpaRepository;
         this.converter = converter;
     }
@@ -58,10 +58,10 @@ public class ChargePointJpaRepositoryImpl implements ChargePointRepository {
     @Override
     public Optional<ChargePoint> findById(ChargePointId chargePointId) {
         Objects.requireNonNull(chargePointId, "充电桩ID不能为空");
-        
+
         log.debug("根据ID查找充电桩: {}", chargePointId.value());
-        
-        return jpaRepository.findById(chargePointId.value())
+
+        return jpaRepository.findByIdWithConnectors(chargePointId.value())
             .map(converter::toDomain);
     }
     

@@ -22,15 +22,11 @@ public record StationResponse(
     String operatorId,
     String status,
     String statusDescription,
-    @JsonFormat(pattern = "HH:mm")
     LocalTime openTime,
-    @JsonFormat(pattern = "HH:mm")
     LocalTime closeTime,
     String businessHoursFormatted,
     boolean canProvideService,
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     Instant createdAt,
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     Instant updatedAt
 ) {
     

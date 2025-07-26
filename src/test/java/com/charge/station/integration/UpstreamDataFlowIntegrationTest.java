@@ -16,6 +16,7 @@ import com.charge.station.infrastructure.persistence.jpa.entity.OutboxEventStatu
 import com.charge.station.infrastructure.persistence.jpa.repository.OutboxEventJpaRepository;
 import com.charge.station.shared.constant.KafkaTopics;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,11 +98,11 @@ class UpstreamDataFlowIntegrationTest {
         checkTestEnvironment();
 
         // 清理数据
-        outboxEventRepository.deleteAll();
-        // 注意：Repository接口没有deleteAll方法，这里只清理发件箱事件
+        cleanupTestData();
 
         // 创建测试充电站
-        StationInfo stationInfo = StationInfo.of("测试充电站", "测试地址", "测试描述");
+        String uniqueStationName = "测试充电站_" + System.currentTimeMillis();
+        StationInfo stationInfo = StationInfo.of(uniqueStationName, "测试地址", "测试描述");
         Location location = Location.of(39.9042, 116.4074);
         BusinessHours businessHours = new BusinessHours(LocalTime.of(0, 0), LocalTime.of(23, 59));
 
@@ -110,18 +111,64 @@ class UpstreamDataFlowIntegrationTest {
 
         // 创建测试充电桩
         PowerSpecification powerSpec = PowerSpecification.ofKilowatts(60.0);
+        String uniqueSerialNumber = "SN123456_" + System.currentTimeMillis();
         testChargePoint = new ChargePoint(
             testStation.getStationId(),
             "测试充电桩",
             "Model-X",
             "Vendor-A",
-            "SN123456",
+            uniqueSerialNumber,
             powerSpec
         );
         testChargePoint = chargePointRepository.save(testChargePoint);
 
         // 清除创建时产生的事件
         outboxEventRepository.deleteAll();
+    }
+
+    @AfterEach
+    @Transactional
+    void tearDown() {
+        // 清理测试数据
+        cleanupTestData();
+    }
+
+    /**
+     * 清理测试数据
+     */
+    private void cleanupTestData() {
+        try {
+            // 清理发件箱事件
+            outboxEventRepository.deleteAll();
+
+            // 清理充电桩数据（如果存在）
+            if (testChargePoint != null) {
+                try {
+                    chargePointRepository.findById(testChargePoint.getChargePointId())
+                        .ifPresent(cp -> {
+                            // 这里需要实现删除逻辑，但由于Repository接口没有delete方法
+                            // 暂时跳过，依赖数据库的级联删除或测试环境的数据隔离
+                        });
+                } catch (Exception e) {
+                    // 忽略删除错误
+                }
+            }
+
+            // 清理充电站数据（如果存在）
+            if (testStation != null) {
+                try {
+                    stationRepository.findById(testStation.getStationId())
+                        .ifPresent(station -> {
+                            // 这里需要实现删除逻辑，但由于Repository接口没有delete方法
+                            // 暂时跳过，依赖数据库的级联删除或测试环境的数据隔离
+                        });
+                } catch (Exception e) {
+                    // 忽略删除错误
+                }
+            }
+        } catch (Exception e) {
+            // 忽略清理错误，避免影响测试
+        }
     }
     
     @Test
