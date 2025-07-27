@@ -130,7 +130,7 @@ public class ChargePointEntityConverter {
     
     /**
      * 将充电枪JPA实体转换为领域对象
-     * 
+     *
      * @param entity 充电枪JPA实体
      * @return 充电枪领域对象
      */
@@ -138,14 +138,16 @@ public class ChargePointEntityConverter {
         ConnectorType connectorType = ConnectorType.fromCode(entity.getConnectorType());
         PowerSpecification powerSpec = PowerSpecification.ofKilowatts(entity.getMaxPower());
         DeviceStatus status = DeviceStatus.fromOcppStatus(entity.getStatus());
-        
-        // 暂时返回一个简化的连接器对象，避免反射问题
-        // TODO: 需要修改Connector类的构造函数或添加Builder模式
+
+        // 创建连接器对象
         Connector connector = new Connector(
             entity.getConnectorId(),
             connectorType,
             powerSpec
         );
+
+        // 设置从数据库读取的状态
+        connector.updateStatus(status, entity.getUpdatedAt() != null ? entity.getUpdatedAt() : entity.getCreatedAt());
 
         return connector;
     }

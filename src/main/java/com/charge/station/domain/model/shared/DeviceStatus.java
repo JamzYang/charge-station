@@ -56,7 +56,7 @@ public enum DeviceStatus {
      * @return true如果设备可用于充电
      */
     public boolean isAvailableForCharging() {
-        return this == AVAILABLE;
+        return this == AVAILABLE || this == PREPARING;
     }
 
     /**
