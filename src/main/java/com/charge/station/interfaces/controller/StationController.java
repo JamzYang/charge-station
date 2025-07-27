@@ -137,7 +137,7 @@ public class StationController {
      * @param size 每页大小
      * @return 充电站列表
      */
-    @GetMapping
+    @GetMapping("/list")
     @Operation(summary = "查询充电站列表", description = "分页查询充电站列表")
     public ApiResponse<PageResponse<StationResponse>> getStations(
         @Parameter(description = "页码（从0开始）")

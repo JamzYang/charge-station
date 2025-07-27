@@ -143,6 +143,16 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
+    public List<ChargePoint> findAllChargePoints(int page, int size) {
+        log.debug("查找充电桩列表");
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return jpaRepository.findAllByOrderByCreatedAtDesc(pageRequest)
+            .stream()
+            .map(converter::toDomain)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ChargePoint> findAvailableChargePointsByStationId(StationId stationId) {
         Objects.requireNonNull(stationId, "充电站ID不能为空");
 

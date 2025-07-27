@@ -38,7 +38,7 @@ public class Station {
 
     /**
      * 创建新的充电站
-     * 
+     *
      * @param stationInfo 充电站信息
      * @param location 地理位置
      * @param operatorId 运营商ID
@@ -54,7 +54,7 @@ public class Station {
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.version = 0L;
-        
+
         // 发布充电站创建事件
         addDomainEvent(new StationCreatedEvent(
             this.stationId,
@@ -63,6 +63,46 @@ public class Station {
             this.operatorId,
             this.createdAt
         ));
+    }
+
+    /**
+     * 从数据库重建充电站对象（用于持久化层）
+     *
+     * @param stationId 充电站ID
+     * @param stationInfo 充电站信息
+     * @param location 地理位置
+     * @param operatorId 运营商ID
+     * @param status 充电站状态
+     * @param businessHours 营业时间
+     * @param createdAt 创建时间
+     * @param updatedAt 更新时间
+     * @param version 版本号
+     * @return 重建的充电站对象
+     */
+    public static Station reconstruct(
+            StationId stationId,
+            StationInfo stationInfo,
+            Location location,
+            String operatorId,
+            StationStatus status,
+            BusinessHours businessHours,
+            Instant createdAt,
+            Instant updatedAt,
+            Long version) {
+
+        Station station = new Station();
+        station.stationId = Objects.requireNonNull(stationId, "充电站ID不能为空");
+        station.stationInfo = Objects.requireNonNull(stationInfo, "充电站信息不能为空");
+        station.location = Objects.requireNonNull(location, "地理位置不能为空");
+        station.operatorId = station.validateOperatorId(operatorId);
+        station.status = Objects.requireNonNull(status, "充电站状态不能为空");
+        station.businessHours = Objects.requireNonNull(businessHours, "营业时间不能为空");
+        station.createdAt = Objects.requireNonNull(createdAt, "创建时间不能为空");
+        station.updatedAt = Objects.requireNonNull(updatedAt, "更新时间不能为空");
+        station.version = Objects.requireNonNull(version, "版本号不能为空");
+
+        // 从数据库重建的对象不发布领域事件
+        return station;
     }
 
     /**

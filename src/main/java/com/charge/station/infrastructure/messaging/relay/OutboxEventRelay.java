@@ -42,7 +42,7 @@ public class OutboxEventRelay {
      * 
      * 每5秒执行一次，查询待发布的事件并发送到Kafka。
      */
-    @Scheduled(fixedDelay = 6000 * 10)
+    @Scheduled(fixedDelay = 6000 * 100)
     @Transactional
     public void relayEvents() {
         try {

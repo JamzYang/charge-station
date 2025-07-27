@@ -76,11 +76,18 @@ public class StationEntityConverter {
             entity.getCloseTime()
         );
         
-        // 暂时返回一个简化的充电站对象，避免反射问题
-        // TODO: 需要修改Station类的构造函数或添加Builder模式
-        Station station = new Station(stationInfo, location, entity.getOperatorId(), businessHours);
-
-        return station;
+        // 使用静态工厂方法重建充电站对象，保持数据库中的原始ID和时间戳
+        return Station.reconstruct(
+            stationId,
+            stationInfo,
+            location,
+            entity.getOperatorId(),
+            status,
+            businessHours,
+            entity.getCreatedAt(),
+            entity.getUpdatedAt(),
+            entity.getVersion()
+        );
     }
     
     /**

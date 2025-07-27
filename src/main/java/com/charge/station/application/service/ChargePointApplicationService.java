@@ -136,6 +136,11 @@ public class ChargePointApplicationService {
         return chargePointRepository.findAvailableChargePoints();
     }
 
+    @Transactional(readOnly = true)
+    public List<ChargePoint> findAllChargePoints(int page, int size) {
+        return chargePointRepository.findAllChargePoints(page, size);
+    }
+
     /**
      * 根据充电站ID查找可用的充电桩列表
      * 

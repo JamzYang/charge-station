@@ -10,6 +10,7 @@ import com.charge.station.interfaces.assembler.ChargePointAssembler;
 import com.charge.station.interfaces.dto.request.CreateChargePointRequest;
 import com.charge.station.interfaces.dto.response.ChargePointResponse;
 import com.charge.station.shared.response.ApiResponse;
+import com.charge.station.shared.response.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -108,6 +109,26 @@ public class ChargePointController {
         
         return ApiResponse.success(responses);
     }
+
+    /**
+     * 查询所有充电桩列表
+     *
+     * @return 充电桩列表
+     */
+    @GetMapping("/charge-points")
+    @Operation(summary = "查询充电桩列表", description = "查询所有可用的充电桩")
+    public ApiResponse<PageResponse<ChargePointResponse>> getAllChargePoints(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size
+    ) {
+        log.info("收到查询充电桩列表请求");
+
+        List<ChargePoint> chargePoints = chargePointApplicationService.findAllChargePoints(page, size);
+        List<ChargePointResponse> responses = chargePointAssembler.toResponseList(chargePoints);
+        long total = chargePointApplicationService.countChargePoints();
+        return ApiResponse.success(PageResponse.of(responses, page, size, total));
+    }
+
 
     /**
      * 查询可用的充电桩列表

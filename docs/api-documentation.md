@@ -22,20 +22,26 @@
     - [4.3 软重置充电桩](#43-软重置充电桩)
     - [4.4 硬重置充电桩](#44-硬重置充电桩)
   - [5. 实时状态接口](#5-实时状态接口)
-    - [5.1 查询充电桩实时状态](#51-查询充电桩实时状态)
-    - [5.2 更新充电桩心跳](#52-更新充电桩心跳)
-    - [5.3 更新充电桩状态](#53-更新充电桩状态)
+    - [5.1 更新充电桩心跳](#51-更新充电桩心跳)
+    - [5.2 更新充电桩状态](#52-更新充电桩状态)
   - [6. 错误处理](#6-错误处理)
     - [6.1 错误码定义](#61-错误码定义)
     - [6.2 错误响应示例](#62-错误响应示例)
   - [7. 数据字典](#7-数据字典)
-    - [7.1 充电站状态枚举](#71-充电站状态枚举)
-    - [7.2 设备状态枚举](#72-设备状态枚举)
-    - [7.3 连接器类型枚举](#73-连接器类型枚举)
+    - [7.1 充电站状态枚举 (StationStatus)](#71-充电站状态枚举-stationstatus)
+    - [7.2 设备状态枚举 (DeviceStatus)](#72-设备状态枚举-devicestatus)
+    - [7.3 连接器类型枚举 (ConnectorType)](#73-连接器类型枚举-connectortype)
   - [8. 环境配置](#8-环境配置)
     - [8.1 开发环境](#81-开发环境)
     - [8.2 测试环境](#82-测试环境)
   - [9. 注意事项](#9-注意事项)
+    - [9.1 异步操作说明](#91-异步操作说明)
+    - [9.2 状态实时性](#92-状态实时性)
+    - [9.3 地理查询优化](#93-地理查询优化)
+    - [9.4 缓存策略](#94-缓存策略)
+    - [9.5 认证授权](#95-认证授权)
+    - [9.6 限流和监控](#96-限流和监控)
+    - [9.7 数据格式说明](#97-数据格式说明)
 
 ---
 
@@ -44,7 +50,7 @@
 ### 1.1 服务概述
 
 **服务名称**: 充电站域服务 (Charge Station Service)  
-**基础URL**: `http://localhost:8080/api/v1`  
+**基础URL**: `http://localhost:8083/api/v1`  
 **API版本**: v1  
 **响应格式**: JSON  
 **字符编码**: UTF-8
@@ -76,8 +82,8 @@
 
 ### 2.1 分页查询充电站列表
 
-**请求方法**: `GET`  
-**URL**: `/api/v1/stations`  
+**请求方法**: `GET`
+**URL**: `/api/v1/stations`
 
 **请求参数**:
 | 参数名 | 类型 | 必需 | 默认值 | 说明 |
@@ -120,7 +126,9 @@ GET /api/v1/stations?page=0&size=10
     "totalElements": 50,
     "totalPages": 5,
     "first": true,
-    "last": false
+    "last": false,
+    "hasNext": true,
+    "hasPrevious": false
   },
   "timestamp": "2025-07-27T10:30:00.000Z"
 }
@@ -128,8 +136,8 @@ GET /api/v1/stations?page=0&size=10
 
 ### 2.2 搜索附近充电站
 
-**请求方法**: `GET`  
-**URL**: `/api/v1/stations/nearby`  
+**请求方法**: `GET`
+**URL**: `/api/v1/stations/nearby`
 
 **请求参数**:
 | 参数名 | 类型 | 必需 | 默认值 | 说明 |
@@ -147,18 +155,24 @@ GET /api/v1/stations/nearby?latitude=39.904200&longitude=116.407400&radius=3000
 ```json
 {
   "success": true,
-  "message": "操作成功", 
+  "message": "操作成功",
   "data": [
     {
       "stationId": "ST001",
       "name": "万达广场充电站",
       "address": "北京市朝阳区建国路93号",
+      "description": null,
       "latitude": 39.904200,
       "longitude": 116.407400,
+      "operatorId": null,
       "status": "ACTIVE",
       "statusDescription": "正常运营",
+      "openTime": null,
+      "closeTime": null,
+      "businessHoursFormatted": null,
       "canProvideService": true,
-      "distance": 1200
+      "createdAt": null,
+      "updatedAt": null
     }
   ],
   "timestamp": "2025-07-27T10:30:00.000Z"
@@ -482,50 +496,7 @@ POST /api/v1/charge-points/CP001/commands/hard-reset
 
 ## 5. 实时状态接口
 
-### 5.1 查询充电桩实时状态
-
-**请求方法**: `GET`
-**URL**: `/api/v1/charge-points/{chargePointId}`
-
-**路径参数**:
-| 参数名 | 类型 | 必需 | 说明 |
-|--------|------|------|------|
-| chargePointId | string | 是 | 充电桩ID |
-
-**请求示例**:
-```
-GET /api/v1/charge-points/CP001
-```
-
-**响应数据结构**:
-```json
-{
-  "success": true,
-  "message": "操作成功",
-  "data": {
-    "chargePointId": "CP001",
-    "stationId": "ST001",
-    "status": "Charging",
-    "statusDescription": "充电中",
-    "lastHeartbeat": "2025-07-27T10:29:00.000Z",
-    "isOnline": true,
-    "isAvailableForCharging": false,
-    "connectors": [
-      {
-        "connectorId": 1,
-        "status": "Charging",
-        "statusDescription": "充电中",
-        "isCharging": true,
-        "maxPower": 7.00,
-        "maxPowerFormatted": "7.00kW"
-      }
-    ]
-  },
-  "timestamp": "2025-07-27T10:30:00.000Z"
-}
-```
-
-### 5.2 更新充电桩心跳
+### 5.1 更新充电桩心跳
 
 **请求方法**: `POST`
 **URL**: `/api/v1/charge-points/{chargePointId}/heartbeat`
@@ -547,14 +518,30 @@ POST /api/v1/charge-points/CP001/heartbeat
   "message": "操作成功",
   "data": {
     "chargePointId": "CP001",
+    "stationId": "ST001",
+    "name": "1号充电桩",
+    "model": null,
+    "vendor": null,
+    "serialNumber": null,
+    "firmwareVersion": null,
+    "status": "Available",
+    "statusDescription": "可用",
     "lastHeartbeat": "2025-07-27T10:30:00.000Z",
-    "isOnline": true
+    "maxPower": null,
+    "maxPowerFormatted": null,
+    "isOnline": true,
+    "isAvailableForCharging": true,
+    "hasAvailableConnector": true,
+    "availableConnectorCount": 1,
+    "connectors": null,
+    "createdAt": null,
+    "updatedAt": null
   },
   "timestamp": "2025-07-27T10:30:00.000Z"
 }
 ```
 
-### 5.3 更新充电桩状态
+### 5.2 更新充电桩状态
 
 **请求方法**: `PUT`
 **URL**: `/api/v1/charge-points/{chargePointId}/status`
@@ -581,8 +568,41 @@ PUT /api/v1/charge-points/CP001/status?status=Available
   "message": "充电桩状态更新成功",
   "data": {
     "chargePointId": "CP001",
+    "stationId": "ST001",
+    "name": "1号充电桩",
+    "model": "AC7KW",
+    "vendor": "特来电",
+    "serialNumber": "TLD001",
+    "firmwareVersion": "1.0.0",
     "status": "Available",
     "statusDescription": "可用",
+    "lastHeartbeat": "2025-07-27T10:29:00.000Z",
+    "maxPower": 7.00,
+    "maxPowerFormatted": "7.00kW",
+    "isOnline": true,
+    "isAvailableForCharging": true,
+    "hasAvailableConnector": true,
+    "availableConnectorCount": 1,
+    "connectors": [
+      {
+        "connectorId": 1,
+        "connectorType": "GB_AC",
+        "connectorTypeDescription": "国标交流慢充",
+        "status": "Available",
+        "statusDescription": "可用",
+        "maxPower": 7.00,
+        "maxPowerFormatted": "7.00kW",
+        "isAvailableForCharging": true,
+        "isCharging": false,
+        "isOffline": false,
+        "isFastCharging": false,
+        "isSuperCharging": false,
+        "displayName": "1号枪(国标交流慢充-7.00kW)",
+        "createdAt": "2025-07-27T10:30:00.000Z",
+        "updatedAt": "2025-07-27T10:30:00.000Z"
+      }
+    ],
+    "createdAt": "2025-07-27T10:30:00.000Z",
     "updatedAt": "2025-07-27T10:30:00.000Z"
   },
   "timestamp": "2025-07-27T10:30:00.000Z"
@@ -683,8 +703,8 @@ PUT /api/v1/charge-points/CP001/status?status=Available
 ### 8.1 开发环境
 
 **服务配置**:
-- **服务地址**: `http://localhost:8080/api/v1`
-- **服务端口**: 8080
+- **服务地址**: `http://localhost:8083/api/v1`
+- **服务端口**: 8083
 - **上下文路径**: `/api/v1`
 
 **依赖服务**:
@@ -693,12 +713,12 @@ PUT /api/v1/charge-points/CP001/status?status=Available
 - **消息队列**: Kafka (localhost:9092)
 
 **API文档**:
-- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
+- **Swagger UI**: `http://localhost:8083/swagger-ui.html`
 
 ### 8.2 测试环境
 
 **服务配置**:
-- **服务地址**: `http://test-env:8080/api/v1`
+- **服务地址**: `http://test-env:8083/api/v1`
 - **数据库**: PostgreSQL (test-db:5432/charge_station_test)
 - **缓存**: Redis (test-redis:6379)
 - **消息队列**: Kafka (test-kafka:9092)

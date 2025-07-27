@@ -120,6 +120,16 @@ public class ChargePointCachedApplicationService {
     }
 
     /**
+     * 查找充电桩列表
+     *
+     * @return 充电桩列表
+     */
+    public List<ChargePoint> findAllChargePoints(int page, int size) {
+        // 可用充电桩列表变化频繁，不缓存
+        return chargePointApplicationService.findAllChargePoints(page, size);
+    }
+
+    /**
      * 根据充电站ID查找可用的充电桩列表
      * 
      * @param stationId 充电站ID

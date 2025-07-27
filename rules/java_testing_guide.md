@@ -358,7 +358,7 @@ class MultiContainerTest {
 ```java
 @Container
 static GenericContainer<?> app = new GenericContainer<>("my-app:latest")
-        .withExposedPorts(8080)
+        .withExposedPorts(8083)
         .waitingFor(Wait.forHttp("/health")
                 .forStatusCode(200)
                 .withStartupTimeout(Duration.ofMinutes(2)));
@@ -532,7 +532,7 @@ class PricingClientTest {
 
     @Container
     static GenericContainer<?> pricingService = new GenericContainer<>("wiremock/wiremock:3.3.1")
-            .withExposedPorts(8080)
+            .withExposedPorts(8083)
             .withClasspathResourceMapping("pricing-mappings", "/home/wiremock", BindMode.READ_ONLY);
 
     @Autowired

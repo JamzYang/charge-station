@@ -84,12 +84,12 @@ GRANT ALL PRIVILEGES ON DATABASE charge_station TO charge_station_user;
 
 访问健康检查端点：
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:8083/health
 ```
 
 访问Actuator健康检查：
 ```bash
-curl http://localhost:8080/actuator/health
+curl http://localhost:8083/actuator/health
 ```
 
 ## 开发指南
@@ -145,7 +145,7 @@ curl http://localhost:8080/actuator/health
 ## API文档
 
 启动应用后，访问 Swagger UI：
-http://localhost:8080/swagger-ui.html
+http://localhost:8083/swagger-ui.html
 
 ## 监控
 
@@ -165,7 +165,7 @@ http://localhost:8080/swagger-ui.html
 ./gradlew bootBuildImage
 
 # 运行容器
-docker run -p 8080:8080 charge-station:1.0.0
+docker run -p 8083:8083 charge-station:1.0.0
 ```
 
 ### Kubernetes部署

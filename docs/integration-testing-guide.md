@@ -67,7 +67,7 @@ Station 服务的测试环境可以与网关服务共享基础中间件：
 
 | 工具 | 地址 | 凭据 |
 |------|------|------|
-| Kafka UI | http://localhost:8082 | 无需登录 |
+| Kafka UI | http://localhost:8083 | 无需登录 |
 | Redis Commander | http://localhost:8084 | 无需登录 |
 | pgAdmin | http://localhost:8085 | 用户: admin@test.com, 密码: admin123 |
 

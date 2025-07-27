@@ -92,6 +92,9 @@ public interface ChargePointRepository  {
      */
     List<ChargePoint> findAvailableChargePoints();
 
+
+    List<ChargePoint> findAllChargePoints(int page, int size);
+
     /**
      * 根据充电站ID查找可用的充电桩列表
      * 
