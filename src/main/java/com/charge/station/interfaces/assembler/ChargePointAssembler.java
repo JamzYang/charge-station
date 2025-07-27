@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 充电桩转换器
@@ -25,7 +26,7 @@ public class ChargePointAssembler {
 
     /**
      * 将创建请求转换为创建命令
-     * 
+     *
      * @param stationId 充电站ID
      * @param request 创建请求
      * @return 创建命令
@@ -33,14 +34,33 @@ public class ChargePointAssembler {
     public CreateChargePointCommand toCreateCommand(StationId stationId, CreateChargePointRequest request) {
         Objects.requireNonNull(stationId, "充电站ID不能为空");
         Objects.requireNonNull(request, "创建请求不能为空");
-        
+
+        // 转换充电枪配置
+        List<CreateChargePointCommand.ConnectorConfig> connectorConfigs = request.connectors().stream()
+            .map(this::toConnectorConfig)
+            .collect(Collectors.toList());
+
         return CreateChargePointCommand.of(
             stationId,
             request.name(),
             request.model(),
             request.vendor(),
             request.serialNumber(),
-            request.maxPower()
+            request.maxPower(),
+            connectorConfigs
+        );
+    }
+
+    /**
+     * 将请求中的充电枪配置转换为命令中的充电枪配置
+     *
+     * @param requestConfig 请求中的充电枪配置
+     * @return 命令中的充电枪配置
+     */
+    private CreateChargePointCommand.ConnectorConfig toConnectorConfig(CreateChargePointRequest.ConnectorConfig requestConfig) {
+        return CreateChargePointCommand.ConnectorConfig.of(
+            requestConfig.connectorType(),
+            requestConfig.maxPower()
         );
     }
 

@@ -3,6 +3,7 @@ package com.charge.station.application.service;
 import com.charge.station.application.command.CreateChargePointCommand;
 import com.charge.station.domain.model.chargepoint.ChargePoint;
 import com.charge.station.domain.model.chargepoint.ChargePointId;
+import com.charge.station.domain.model.chargepoint.ConnectorType;
 import com.charge.station.domain.model.shared.DeviceStatus;
 import com.charge.station.domain.model.shared.PowerSpecification;
 import com.charge.station.domain.model.station.StationId;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -40,30 +42,35 @@ public class ChargePointApplicationService {
 
     /**
      * 创建充电桩
-     * 
+     *
      * @param command 创建充电桩命令
      * @return 创建的充电桩
      */
     @Transactional
     public ChargePoint createChargePoint(CreateChargePointCommand command) {
         Objects.requireNonNull(command, "创建充电桩命令不能为空");
-        
-        log.info("开始创建充电桩: stationId={}, name={}", command.stationId(), command.name());
-        
+        Objects.requireNonNull(command.connectors(), "充电枪配置不能为空");
+
+        log.info("开始创建充电桩: stationId={}, name={}, connectorCount={}",
+            command.stationId(), command.name(), command.connectors().size());
+
         // 1. 验证充电站是否存在
         if (!stationRepository.existsById(command.stationId())) {
             throw new ResourceNotFoundException("充电站不存在: " + command.stationId());
         }
-        
+
         // 2. 验证序列号唯一性（如果提供了序列号）
         if (command.serialNumber() != null && !command.serialNumber().trim().isEmpty()) {
             chargePointDomainService.validateSerialNumberUniqueness(command.serialNumber());
         }
-        
-        // 3. 创建功率规格
+
+        // 3. 验证充电枪配置
+        validateConnectorConfigs(command.connectors(), command.maxPower());
+
+        // 4. 创建功率规格
         PowerSpecification powerSpecification = PowerSpecification.ofKilowatts(command.maxPower());
-        
-        // 4. 创建充电桩聚合
+
+        // 5. 创建充电桩聚合
         ChargePoint chargePoint = new ChargePoint(
             command.stationId(),
             command.name(),
@@ -72,15 +79,19 @@ public class ChargePointApplicationService {
             command.serialNumber(),
             powerSpecification
         );
-        
-        // 5. 保存充电桩
+
+        // 6. 添加充电枪
+        addConnectorsToChargePoint(chargePoint, command.connectors());
+
+        // 7. 保存充电桩
         ChargePoint savedChargePoint = chargePointRepository.save(chargePoint);
 
-        // 6. 发布领域事件
+        // 8. 发布领域事件
         domainEventPublishingService.publishDomainEvents(savedChargePoint);
 
-        log.info("充电桩创建成功: chargePointId={}, stationId={}, name={}",
-            savedChargePoint.getChargePointId(), savedChargePoint.getStationId(), savedChargePoint.getName());
+        log.info("充电桩创建成功: chargePointId={}, stationId={}, name={}, connectorCount={}",
+            savedChargePoint.getChargePointId(), savedChargePoint.getStationId(),
+            savedChargePoint.getName(), savedChargePoint.getConnectors().size());
 
         return savedChargePoint;
     }
@@ -289,12 +300,65 @@ public class ChargePointApplicationService {
 
     /**
      * 统计充电桩总数
-     * 
+     *
      * @return 充电桩总数
      */
     @Transactional(readOnly = true)
     public long countChargePoints() {
         return chargePointRepository.count();
+    }
+
+    /**
+     * 验证充电枪配置
+     *
+     * @param connectorConfigs 充电枪配置列表
+     * @param totalPower 充电桩总功率
+     */
+    private void validateConnectorConfigs(List<CreateChargePointCommand.ConnectorConfig> connectorConfigs,
+                                        BigDecimal totalPower) {
+        if (connectorConfigs.isEmpty()) {
+            throw new IllegalArgumentException("充电枪配置不能为空");
+        }
+
+        if (connectorConfigs.size() > 10) {
+            throw new IllegalArgumentException("充电枪数量不能超过10个");
+        }
+
+        // 验证充电枪功率总和不超过充电桩总功率
+        BigDecimal totalConnectorPower = connectorConfigs.stream()
+            .map(CreateChargePointCommand.ConnectorConfig::maxPower)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (totalConnectorPower.compareTo(totalPower) > 0) {
+            throw new IllegalArgumentException(
+                String.format("充电枪功率总和(%.2fkW)不能超过充电桩总功率(%.2fkW)",
+                    totalConnectorPower, totalPower));
+        }
+
+        // 验证每个充电枪的连接器类型
+        for (CreateChargePointCommand.ConnectorConfig config : connectorConfigs) {
+            try {
+                ConnectorType.fromCode(config.connectorType());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("无效的连接器类型: " + config.connectorType());
+            }
+        }
+    }
+
+    /**
+     * 为充电桩添加充电枪
+     *
+     * @param chargePoint 充电桩
+     * @param connectorConfigs 充电枪配置列表
+     */
+    private void addConnectorsToChargePoint(ChargePoint chargePoint,
+                                          List<CreateChargePointCommand.ConnectorConfig> connectorConfigs) {
+        for (CreateChargePointCommand.ConnectorConfig config : connectorConfigs) {
+            ConnectorType connectorType = ConnectorType.fromCode(config.connectorType());
+            chargePoint.addConnector(connectorType, config.maxPower());
+        }
+
+        log.info("为充电桩添加了{}个充电枪", connectorConfigs.size());
     }
 
     /**

@@ -1,0 +1,91 @@
+###
+POST http://localhost:8080/api/v1/stations
+Content-Type: application/json
+
+{
+  "name": "test_01",
+  "address": "上海 浦东 陆家嘴中心",
+  "description": "陆家嘴中心充电站",
+  "latitude": 1.333,
+  "longitude": 1.3333,
+  "operatorId": "test_cpo",
+  "openTime": "08:00",
+  "closeTime": "20:00"
+}
+
+<> 2025-07-27T230538.201.json
+<> 2025-07-27T223737.201.json
+<> 2025-07-27T223717.500.json
+<> 2025-07-26T234611.201.json
+<> 2025-07-26T232116.500.json
+<> 2025-07-26T231350.500.json
+<> 2025-07-26T231323.500.json
+<> 2025-07-26T231317.500.json
+<> 2025-07-26T231222.500.json
+<> 2025-07-26T230937.500.json
+<> 2025-07-26T230121.500.json
+<> 2025-07-26T225654.500.json
+<> 2025-07-26T225640.500.json
+<> 2025-07-26T224709.500.json
+<> 2025-07-26T224146.500.json
+<> 2025-07-26T224047.500.json
+<> 2025-07-26T223931.500.json
+<> 2025-07-26T223902.500.json
+
+###
+###
+POST http://localhost:8083/api/v1/stations/ST9edff028850e460c846d/charge-points
+Content-Type: application/json
+
+{
+  "name": "test_cp01",
+  "model": "test_model",
+  "vendor": "tesla",
+  "serialNumber": "SN_001",
+  "maxPower": 100,
+  "connectors": [
+    {
+      "connectorType": "GB_DC",
+      "maxPower": 50
+    }
+  ]
+}
+
+<> 2025-07-28T004736.201.json
+<> 2025-07-27T230946.201.json
+###
+
+GET http://localhost:8080/api/v1/stations/list?page=0&size=50
+
+<> 2025-07-27T223757.200.json
+<> 2025-07-27T223627.200.json
+###
+GET http://localhost:8080/api/v1/stations/list?page=0&size=50&sort=createdAt&direction=DESC
+
+<> 2025-07-27T230531.200.json
+<> 2025-07-27T223932.200.json
+
+###
+GET http://localhost:3000/api/v1/stations/ST8641e4197b7640a38b2a
+
+<> 2025-07-27T225626.500.txt
+
+###
+GET http://localhost:3000/api/v1/stations/ST9edff028850e460c846d
+
+<> 2025-07-27T234318.200.json
+
+
+###
+GET http://localhost:8083/api/v1/charge-points?page=0&size=100&sort=chargePointId&direction=ASC
+
+<> 2025-07-27T234717.500.json
+
+###
+GET http://localhost:8083/api/v1/charge-points/CP673b4f7acfdb428a8e7a
+
+<> 2025-07-28T011351.200.json
+<> 2025-07-28T011009.200.json
+<> 2025-07-28T010938.200.json
+<> 2025-07-28T010548.200.json
+<> 2025-07-28T010237.200.json
