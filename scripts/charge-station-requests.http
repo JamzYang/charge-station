@@ -1,5 +1,5 @@
 ###
-POST http://localhost:8080/api/v1/stations
+POST http://localhost:8083/api/v1/stations
 Content-Type: application/json
 
 {
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 ###
 ###
-POST http://localhost:8083/api/v1/stations/ST9edff028850e460c846d/charge-points
+POST http://localhost:8083/api/v1/stations/STbbb0d362a50f4c28a2f5/charge-points
 Content-Type: application/json
 
 {
@@ -47,6 +47,10 @@ Content-Type: application/json
     {
       "connectorType": "GB_DC",
       "maxPower": 50
+    },
+    {
+      "connectorType": "GB_DC",
+      "maxPower": 10
     }
   ]
 }
@@ -55,12 +59,12 @@ Content-Type: application/json
 <> 2025-07-27T230946.201.json
 ###
 
-GET http://localhost:8080/api/v1/stations/list?page=0&size=50
+GET http://localhost:8083/api/v1/stations/list?page=0&size=50
 
 <> 2025-07-27T223757.200.json
 <> 2025-07-27T223627.200.json
 ###
-GET http://localhost:8080/api/v1/stations/list?page=0&size=50&sort=createdAt&direction=DESC
+GET http://localhost:8083/api/v1/stations/list?page=0&size=50&sort=createdAt&direction=DESC
 
 <> 2025-07-27T230531.200.json
 <> 2025-07-27T223932.200.json
