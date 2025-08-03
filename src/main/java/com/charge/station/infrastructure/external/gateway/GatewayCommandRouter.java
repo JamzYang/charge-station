@@ -14,6 +14,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -34,7 +36,8 @@ public class GatewayCommandRouter {
     private final StringRedisTemplate redisTemplate;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
-    
+    private final KafkaTopics kafkaTopics;
+
     /**
      * 与网关约定的总分区数
      */
@@ -87,7 +90,7 @@ public class GatewayCommandRouter {
             String message = objectMapper.writeValueAsString(commandDTO);
             
             // 精确发送到目标分区
-            kafkaTemplate.send(KafkaTopics.COMMANDS_DOWN, partitionId, chargePointId.value(), message)
+            kafkaTemplate.send(kafkaTopics.COMMANDS_DOWN, partitionId, chargePointId.value(), message)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("指令发送失败: commandId={}, chargePointId={}, partition={}",

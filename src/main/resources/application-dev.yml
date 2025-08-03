@@ -58,6 +58,7 @@ app:
     topics:
       ocpp-events-up: ocpp-events-up
       commands-down: commands-down
+      integration-events: station-integration-events
     partitions:
       total: 3
   cache:

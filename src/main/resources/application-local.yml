@@ -58,8 +58,9 @@ app:
     topics:
       ocpp-events-up: ocpp-events-up-local
       commands-down: commands-down-local
+      integration-events: station-integration-events
     partitions:
-      total: 3
+      total: 1
   cache:
     ttl:
       station-detail: 1800  # 30分钟

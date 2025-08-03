@@ -29,11 +29,14 @@ public class DeviceEventConsumer {
 
     private final ObjectMapper objectMapper;
     private final DeviceStatusEventHandler deviceStatusEventHandler;
+    private final KafkaTopics kafkaTopics;
 
     public DeviceEventConsumer(ObjectMapper objectMapper,
-                              DeviceStatusEventHandler deviceStatusEventHandler) {
+                              DeviceStatusEventHandler deviceStatusEventHandler,
+                              KafkaTopics kafkaTopics) {
         this.objectMapper = objectMapper;
         this.deviceStatusEventHandler = deviceStatusEventHandler;
+        this.kafkaTopics = kafkaTopics;
     }
     
     /**
@@ -45,7 +48,7 @@ public class DeviceEventConsumer {
      * @param acknowledgment 确认对象
      */
     @KafkaListener(
-        topics = KafkaTopics.OCPP_EVENTS_UP,
+        topics = "#{kafkaTopics.OCPP_EVENTS_UP}",
         groupId = "station-service",
         containerFactory = "kafkaListenerContainerFactory"
     )

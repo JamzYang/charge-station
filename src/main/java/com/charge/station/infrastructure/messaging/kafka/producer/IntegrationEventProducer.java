@@ -23,9 +23,10 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @Slf4j
 public class IntegrationEventProducer {
-    
+
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final IntegrationEventMapper eventMapper;
+    private final KafkaTopics kafkaTopics;
     
     /**
      * 发送集成事件
@@ -73,6 +74,6 @@ public class IntegrationEventProducer {
     private String determineTopicByEventType(String eventType) {
         // 目前所有集成事件都发送到同一个Topic
         // 后续可以根据事件类型路由到不同的Topic
-        return KafkaTopics.INTEGRATION_EVENTS;
+        return kafkaTopics.INTEGRATION_EVENTS;
     }
 }
