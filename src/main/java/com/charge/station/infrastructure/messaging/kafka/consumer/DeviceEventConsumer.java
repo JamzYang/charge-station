@@ -63,6 +63,7 @@ public class DeviceEventConsumer {
             
             if (event == null) {
                 log.warn("解析网关事件失败，消息为空: partition={}, offset={}", partition, offset);
+                log.warn("message: {}", message);
                 acknowledgment.acknowledge();
                 return;
             }

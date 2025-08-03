@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev
+    active: local
   main:
     allow-circular-references: true
   application:
@@ -40,7 +40,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
-        format_sql: true
+        format_sql: false
         use_sql_comments: true
         jdbc:
           batch_size: 20
@@ -132,7 +132,7 @@ app:
       ocpp-events-up: ocpp-events-up
       commands-down: commands-down
     partitions:
-      total: 128
+      total: 3
   cache:
     ttl:
       station-detail: 1800  # 30分钟

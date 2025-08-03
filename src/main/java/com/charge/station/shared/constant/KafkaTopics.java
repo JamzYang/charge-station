@@ -11,12 +11,12 @@ public final class KafkaTopics {
     /**
      * 上行事件主题 - 网关上报的设备事件
      */
-    public static final String OCPP_EVENTS_UP = "ocpp-events-up";
+    public static final String OCPP_EVENTS_UP = "ocpp-events-up-local";
     
     /**
      * 下行指令主题 - 向网关发送的控制指令
      */
-    public static final String COMMANDS_DOWN = "commands-down";
+    public static final String COMMANDS_DOWN = "commands-down-local";
 
     /**
      * 集成事件主题 - 场站服务对外发布的集成事件

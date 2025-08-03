@@ -56,8 +56,8 @@ logging:
 app:
   kafka:
     topics:
-      ocpp-events-up: ocpp-events-up
-      commands-down: commands-down
+      ocpp-events-up: ocpp-events-up-local
+      commands-down: commands-down-local
     partitions:
       total: 3
   cache:
