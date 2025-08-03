@@ -30,6 +30,20 @@ public class Connector {
     private Instant updatedAt;
 
     /**
+     * 从数据库重建连接器对象（不发布领域事件）
+     */
+    public static Connector reconstruct(Long id, Integer connectorId, ConnectorType connectorType,
+        PowerSpecification powerSpecification, DeviceStatus status,
+        Instant createdAt, Instant updatedAt) {
+        Connector connector = new Connector(connectorId, connectorType, powerSpecification);
+        connector.id = id;  // 设置数据库ID
+        connector.status = status;
+        connector.createdAt = createdAt;
+        connector.updatedAt = updatedAt;
+        return connector;
+    }
+
+    /**
      * 创建新的充电枪
      * 
      * @param connectorId 连接器编号（在充电桩内唯一）
