@@ -2,6 +2,7 @@ package com.charge.station.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -114,12 +115,42 @@ public class JacksonConfig {
     }
 
     /**
-     * Instant 自定义反序列化器（从中国时区解析）
+     * Instant 自定义反序列化器（支持毫秒级时间戳）
      */
     public static class InstantDeserializer extends JsonDeserializer<Instant> {
         @Override
         public Instant deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            return Instant.from(DATETIME_FORMATTER.withZone(CHINA_ZONE).parse(p.getValueAsString()));
+            if (p.hasToken(JsonToken.VALUE_NUMBER_INT)) {
+                // 处理数字类型的时间戳
+                long timestamp = p.getValueAsLong();
+
+                // 判断是秒级还是毫秒级时间戳
+                // 毫秒级时间戳通常大于 10^12 (1000000000000)
+                if (timestamp > 1_000_000_000_000L) {
+                    // 毫秒级时间戳
+                    return Instant.ofEpochMilli(timestamp);
+                } else {
+                    // 秒级时间戳
+                    return Instant.ofEpochSecond(timestamp);
+                }
+            } else if (p.hasToken(JsonToken.VALUE_STRING)) {
+                // 处理字符串类型的时间戳或ISO格式
+                String value = p.getValueAsString();
+                try {
+                    // 尝试解析为数字时间戳
+                    long timestamp = Long.parseLong(value);
+                    if (timestamp > 1_000_000_000_000L) {
+                        return Instant.ofEpochMilli(timestamp);
+                    } else {
+                        return Instant.ofEpochSecond(timestamp);
+                    }
+                } catch (NumberFormatException e) {
+                    // 如果不是数字，尝试解析为ISO格式
+                    return Instant.parse(value);
+                }
+            }
+
+            throw new IOException("无法解析时间戳: " + p.getText());
         }
     }
 }
